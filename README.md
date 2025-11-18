@@ -20,6 +20,54 @@ Construir una aplicación web interactiva y funcional usando **React + TypeScrip
 - Ver detalles completos de proyectos y tareas
 - Colaborar con el equipo visualizando actividades y asignaciones
 
+## Ejecución local
+
+1. Instala dependencias:
+
+   ```bash
+   cd frontend
+   npm install
+   ```
+
+2. Configura las variables de entorno copiando el archivo de ejemplo:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   ```env
+   VITE_API_URL=https://cs2031-2025-2-hackathon-2-backend-production.up.railway.app/v1
+   ```
+
+3. Levanta el entorno de desarrollo:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Construye y previsualiza la app para producción:
+
+   ```bash
+   npm run build
+   npm run preview
+   ```
+
+### Tecnologías utilizadas
+
+- React 18 + TypeScript
+- Vite
+- Tailwind CSS
+- React Router DOM
+- Axios
+
+### Funcionalidades implementadas
+
+- Autenticación con login, registro, logout y refresco del perfil
+- Dashboard con métricas de tareas, proyectos y actividad reciente
+- Gestión integral de proyectos con búsqueda, creación, edición y eliminación
+- Gestión de tareas con filtros por estado/prioridad y formularios en modales
+- Componentes reutilizables (Button, Input, Card, Modal) y servicios tipados para la API
+
 ## Autenticación y Seguridad
 
 Todas las llamadas a la API requieren un token JWT válido en el header `Authorization: Bearer <token>` para garantizar la seguridad y privacidad de los datos.
