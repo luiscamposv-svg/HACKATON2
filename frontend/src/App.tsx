@@ -5,6 +5,7 @@ import DashboardPage from './pages/Dashboard';
 import ProjectsPage from './pages/Projects';
 import TasksPage from './pages/Tasks';
 import ProfilePage from './pages/Profile';
+import TeamPage from './pages/Team';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/common/AppLayout';
 
@@ -23,6 +24,7 @@ const App = () => (
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/projects" element={<ProjectsPage />} />
       <Route path="/tasks" element={<TasksPage />} />
+      <Route path="/team" element={<TeamPage />} />
       <Route path="/profile" element={<ProfilePage />} />
     </Route>
     <Route path="*" element={<Navigate to="/dashboard" replace />} />

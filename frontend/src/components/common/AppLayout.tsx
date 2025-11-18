@@ -5,6 +5,7 @@ const links = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/projects', label: 'Proyectos' },
   { to: '/tasks', label: 'Tareas' },
+  { to: '/team', label: 'Equipo' },
   { to: '/profile', label: 'Perfil' },
 ];
 

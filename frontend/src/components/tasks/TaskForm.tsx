@@ -1,8 +1,9 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { Project, Task, TaskPriority, TaskStatus } from '../../types';
+import { Project, Task, TaskPriority, TaskStatus, TeamMember } from '../../types';
 import Input from '../common/Input';
 import Button from '../common/Button';
 import { fetchProjects } from '../../services/projectService';
+import { fetchTeamMembers } from '../../services/teamService';
 
 interface Props {
   initialValues?: Partial<Task>;
@@ -18,8 +19,11 @@ const TaskForm = ({ initialValues, onSubmit, onCancel }: Props) => {
   const [dueDate, setDueDate] = useState(initialValues?.dueDate?.slice(0, 10) ?? '');
   const [projectId, setProjectId] = useState(initialValues?.projectId ?? '');
   const [projects, setProjects] = useState<Project[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+  const [isLoadingMembers, setIsLoadingMembers] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [assignedTo, setAssignedTo] = useState(initialValues?.assignedTo ?? initialValues?.assignee?.id ?? '');
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -33,8 +37,20 @@ const TaskForm = ({ initialValues, onSubmit, onCancel }: Props) => {
         setIsLoadingProjects(false);
       }
     };
+    const loadMembers = async () => {
+      try {
+        setIsLoadingMembers(true);
+        const members = await fetchTeamMembers();
+        setTeamMembers(members);
+      } catch (error) {
+        console.error('No se pudieron cargar los miembros del equipo', error);
+      } finally {
+        setIsLoadingMembers(false);
+      }
+    };
 
     loadProjects();
+    loadMembers();
   }, []);
 
   useEffect(() => {
@@ -44,9 +60,15 @@ const TaskForm = ({ initialValues, onSubmit, onCancel }: Props) => {
     setPriority(initialValues?.priority ?? 'MEDIUM');
     setDueDate(initialValues?.dueDate?.slice(0, 10) ?? '');
     setProjectId(initialValues?.projectId ?? '');
+    setAssignedTo(initialValues?.assignedTo ?? initialValues?.assignee?.id ?? '');
   }, [initialValues]);
 
-  const isSubmitDisabled = isSubmitting || !projectId || (!isLoadingProjects && projects.length === 0);
+  const isSubmitDisabled =
+    isSubmitting ||
+    !projectId ||
+    !assignedTo ||
+    (!isLoadingProjects && projects.length === 0) ||
+    (!isLoadingMembers && teamMembers.length === 0);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -59,7 +81,8 @@ const TaskForm = ({ initialValues, onSubmit, onCancel }: Props) => {
         status,
         priority,
         projectId,
-        dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
+        dueDate: dueDate || undefined,
+        assignedTo,
       });
     } finally {
       setIsSubmitting(false);
@@ -88,6 +111,28 @@ const TaskForm = ({ initialValues, onSubmit, onCancel }: Props) => {
       {!isLoadingProjects && projects.length === 0 && (
         <p className="text-xs font-medium text-amber-600">
           Debes crear al menos un proyecto antes de poder registrar tareas.
+        </p>
+      )}
+      <label className="flex flex-col gap-1 text-sm font-medium text-slate-600">
+        Miembro asignado
+        <select
+          className="rounded-lg border border-slate-200 px-3 py-2"
+          required
+          value={assignedTo}
+          onChange={(e) => setAssignedTo(e.target.value)}
+          disabled={isLoadingMembers || teamMembers.length === 0}
+        >
+          <option value="">{isLoadingMembers ? 'Cargando miembros...' : 'Selecciona un responsable'}</option>
+          {teamMembers.map((member) => (
+            <option key={member.id} value={member.id}>
+              {member.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      {!isLoadingMembers && teamMembers.length === 0 && (
+        <p className="text-xs font-medium text-amber-600">
+          No hay miembros disponibles para asignar tareas todavía.
         </p>
       )}
       <Input label="Título" required value={title} onChange={(e) => setTitle(e.target.value)} />

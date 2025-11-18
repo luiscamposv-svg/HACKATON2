@@ -5,7 +5,7 @@ export interface TaskFilters {
   projectId?: string;
   status?: TaskStatus;
   priority?: TaskPriority;
-  assigneeId?: string;
+  assignedTo?: string;
   page?: number;
   limit?: number;
 }

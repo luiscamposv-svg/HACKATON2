@@ -65,7 +65,8 @@ Construir una aplicación web interactiva y funcional usando **React + TypeScrip
 - Autenticación con login, registro, logout y refresco del perfil
 - Dashboard con métricas de tareas, proyectos y actividad reciente
 - Gestión integral de proyectos con búsqueda, creación, edición y eliminación
-- Gestión de tareas con filtros por estado/prioridad y formularios en modales
+- Gestión de tareas con filtros por estado, prioridad, proyecto y responsable, detalles completos, asignación a miembros del equipo y acciones rápidas para marcar como completadas
+- Vista del equipo para consultar los miembros disponibles y las tareas asignadas desde los endpoints de bonus
 - Componentes reutilizables (Button, Input, Card, Modal) y servicios tipados para la API
 
 ## Autenticación y Seguridad

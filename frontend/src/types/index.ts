@@ -9,6 +9,10 @@ export interface User {
   createdAt?: string;
 }
 
+export interface TeamMember extends User {
+  role?: string;
+}
+
 export interface AuthResponse {
   token: string;
   user: User;
@@ -31,7 +35,9 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   projectId: string;
-  assigneeId?: string;
+  project?: Project;
+  assignedTo?: string;
+  assignee?: TeamMember;
   dueDate?: string;
   createdAt: string;
   updatedAt: string;
