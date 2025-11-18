@@ -1,7 +1,8 @@
-import { FormEvent, useState } from 'react';
-import { Task, TaskPriority, TaskStatus } from '../../types';
+import { FormEvent, useEffect, useState } from 'react';
+import { Project, Task, TaskPriority, TaskStatus } from '../../types';
 import Input from '../common/Input';
 import Button from '../common/Button';
+import { fetchProjects } from '../../services/projectService';
 
 interface Props {
   initialValues?: Partial<Task>;
@@ -15,17 +16,80 @@ const TaskForm = ({ initialValues, onSubmit, onCancel }: Props) => {
   const [status, setStatus] = useState<TaskStatus>(initialValues?.status ?? 'TODO');
   const [priority, setPriority] = useState<TaskPriority>(initialValues?.priority ?? 'MEDIUM');
   const [dueDate, setDueDate] = useState(initialValues?.dueDate?.slice(0, 10) ?? '');
+  const [projectId, setProjectId] = useState(initialValues?.projectId ?? '');
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        setIsLoadingProjects(true);
+        const response = await fetchProjects({ limit: 50 });
+        setProjects(response.data);
+      } catch (error) {
+        console.error('No se pudieron cargar los proyectos disponibles', error);
+      } finally {
+        setIsLoadingProjects(false);
+      }
+    };
+
+    loadProjects();
+  }, []);
+
+  useEffect(() => {
+    setTitle(initialValues?.title ?? '');
+    setDescription(initialValues?.description ?? '');
+    setStatus(initialValues?.status ?? 'TODO');
+    setPriority(initialValues?.priority ?? 'MEDIUM');
+    setDueDate(initialValues?.dueDate?.slice(0, 10) ?? '');
+    setProjectId(initialValues?.projectId ?? '');
+  }, [initialValues]);
+
+  const isSubmitDisabled = isSubmitting || !projectId || (!isLoadingProjects && projects.length === 0);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    if (!projectId) return;
     setIsSubmitting(true);
-    await onSubmit({ title, description, status, priority, dueDate });
-    setIsSubmitting(false);
+    try {
+      await onSubmit({
+        title,
+        description,
+        status,
+        priority,
+        projectId,
+        dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+      <label className="flex flex-col gap-1 text-sm font-medium text-slate-600">
+        Proyecto asociado
+        <select
+          className="rounded-lg border border-slate-200 px-3 py-2"
+          required
+          value={projectId}
+          onChange={(e) => setProjectId(e.target.value)}
+          disabled={isLoadingProjects || projects.length === 0}
+        >
+          <option value="">{isLoadingProjects ? 'Cargando proyectos...' : 'Selecciona un proyecto'}</option>
+          {projects.map((project) => (
+            <option key={project.id} value={project.id}>
+              {project.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      {!isLoadingProjects && projects.length === 0 && (
+        <p className="text-xs font-medium text-amber-600">
+          Debes crear al menos un proyecto antes de poder registrar tareas.
+        </p>
+      )}
       <Input label="Título" required value={title} onChange={(e) => setTitle(e.target.value)} />
       <label className="flex flex-col gap-1 text-sm font-medium text-slate-600">
         Descripción
@@ -60,7 +124,7 @@ const TaskForm = ({ initialValues, onSubmit, onCancel }: Props) => {
         <Button type="button" variant="ghost" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitDisabled}>
           {isSubmitting ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>

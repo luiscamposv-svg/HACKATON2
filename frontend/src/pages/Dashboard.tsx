@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
-import { fetchProjects } from '../services/projectService';
-import { fetchTasks } from '../services/taskService';
+import Modal from '../components/common/Modal';
+import TaskForm from '../components/tasks/TaskForm';
+import ProjectForm from '../components/projects/ProjectForm';
+import { createProject, fetchProjects } from '../services/projectService';
+import { createTask, fetchTasks } from '../services/taskService';
 import { Project, Task } from '../types';
 import { useAuth } from '../hooks/useAuth';
 
@@ -10,24 +13,38 @@ const DashboardPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const { user } = useAuth();
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const [projectResponse, taskResponse] = await Promise.all([fetchProjects({ limit: 5 }), fetchTasks({ limit: 10 })]);
-        setProjects(projectResponse.data);
-        setTasks(taskResponse.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [projectResponse, taskResponse] = await Promise.all([fetchProjects({ limit: 5 }), fetchTasks({ limit: 10 })]);
+      setProjects(projectResponse.data);
+      setTasks(taskResponse.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handleTaskSubmit = async (values: Partial<Task>) => {
+    await createTask(values);
+    setIsTaskModalOpen(false);
+    await loadData();
+  };
+
+  const handleProjectSubmit = async (values: { name: string; description: string; status: Project['status'] }) => {
+    await createProject(values);
+    setIsProjectModalOpen(false);
+    await loadData();
+  };
 
   const completedTasks = tasks.filter((task) => task.status === 'COMPLETED').length;
   const pendingTasks = tasks.filter((task) => task.status !== 'COMPLETED').length;
@@ -41,8 +58,10 @@ const DashboardPage = () => {
           <p className="text-sm text-slate-500">Revisa el estado de tus proyectos y tareas.</p>
         </div>
         <div className="flex gap-3">
-          <Button>Crear tarea</Button>
-          <Button variant="secondary">Nuevo proyecto</Button>
+          <Button onClick={() => setIsTaskModalOpen(true)}>Crear tarea</Button>
+          <Button variant="secondary" onClick={() => setIsProjectModalOpen(true)}>
+            Nuevo proyecto
+          </Button>
         </div>
       </header>
 
@@ -96,6 +115,28 @@ const DashboardPage = () => {
           )}
         </Card>
       </div>
+
+      <Modal
+        title="Nueva tarea"
+        isOpen={isTaskModalOpen}
+        onClose={() => setIsTaskModalOpen(false)}
+      >
+        <TaskForm
+          onSubmit={handleTaskSubmit}
+          onCancel={() => setIsTaskModalOpen(false)}
+        />
+      </Modal>
+
+      <Modal
+        title="Nuevo proyecto"
+        isOpen={isProjectModalOpen}
+        onClose={() => setIsProjectModalOpen(false)}
+      >
+        <ProjectForm
+          onSubmit={handleProjectSubmit}
+          onCancel={() => setIsProjectModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 };
