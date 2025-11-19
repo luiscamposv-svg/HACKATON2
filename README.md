@@ -20,6 +20,61 @@ Construir una aplicación web interactiva y funcional usando **React + TypeScrip
 - Ver detalles completos de proyectos y tareas
 - Colaborar con el equipo visualizando actividades y asignaciones
 
+## Ejecución local
+
+1. Instala dependencias:
+
+   ```bash
+   cd frontend
+   npm install
+   ```
+
+2. Configura las variables de entorno copiando el archivo de ejemplo:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   ```env
+   VITE_API_URL=/api
+   VITE_API_PROXY_TARGET=https://cs2031-2025-2-hackathon-2-backend-production.up.railway.app/v1
+   ```
+
+   > La URL relativa permite que Vite redirija las peticiones a través del proxy configurado en `vite.config.ts`, lo que evita los errores de CORS al trabajar en `http://localhost:5173`. Para el build de producción puedes sobreescribir `VITE_API_URL` con la URL pública de la API.
+
+3. Levanta el entorno de desarrollo:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Construye y previsualiza la app para producción:
+
+   ```bash
+   npm run build
+   npm run preview
+   ```
+
+### Tecnologías utilizadas
+
+- React 18 + TypeScript
+- Vite
+- Tailwind CSS
+- React Router DOM
+- Axios
+
+### Funcionalidades implementadas
+
+- Autenticación con login, registro, logout y refresco del perfil
+- Dashboard con métricas de tareas, proyectos y actividad reciente
+- Gestión integral de proyectos con búsqueda, creación, edición y eliminación
+- Gestión de tareas con filtros por estado, prioridad, proyecto y responsable, detalles completos, asignación a miembros del equipo y acciones rápidas para marcar como completadas
+- Vista del equipo para consultar los miembros disponibles y las tareas asignadas desde los endpoints de bonus
+- Componentes reutilizables (Button, Input, Card, Modal) y servicios tipados para la API
+- Vista Kanban con drag & drop, polling cada 5 segundos y exportación CSV de tareas
+- Comentarios, etiquetas y adjuntos locales para cada tarea junto con notificaciones de fechas próximas
+- Búsqueda global de proyectos y tareas, dashboard analítico avanzado y toggle de modo oscuro persistente
+
 ## Autenticación y Seguridad
 
 Todas las llamadas a la API requieren un token JWT válido en el header `Authorization: Bearer <token>` para garantizar la seguridad y privacidad de los datos.
