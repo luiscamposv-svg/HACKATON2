@@ -11,12 +11,9 @@ export interface TaskFilters {
 }
 
 export const fetchTasks = async (filters: TaskFilters = {}) => {
-  const params = new URLSearchParams();
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value) params.append(key, value.toString());
+  const { data } = await api.get<{ tasks: Task[]; totalPages: number; currentPage: number }>('/tasks', {
+    params: filters,
   });
-  const url = `/tasks${params.toString() ? `?${params.toString()}` : ''}`;
-  const { data } = await api.get<{ tasks: Task[]; totalPages: number; currentPage: number }>(url);
   return {
     data: data.tasks,
     totalPages: data.totalPages,

@@ -8,12 +8,9 @@ export interface ProjectFilters {
 }
 
 export const fetchProjects = async (filters: ProjectFilters = {}) => {
-  const params = new URLSearchParams();
-  if (filters.page) params.append('page', filters.page.toString());
-  if (filters.limit) params.append('limit', filters.limit.toString());
-  if (filters.search) params.append('search', filters.search);
-  const url = `/projects${params.toString() ? `?${params.toString()}` : ''}`;
-  const { data } = await api.get<{ projects: Project[]; totalPages: number; currentPage: number }>(url);
+  const { data } = await api.get<{ projects: Project[]; totalPages: number; currentPage: number }>('/projects', {
+    params: filters,
+  });
   return {
     data: data.projects,
     totalPages: data.totalPages,
