@@ -48,3 +48,24 @@ export interface PaginatedResponse<T> {
   totalPages: number;
   currentPage: number;
 }
+
+export interface TaskComment {
+  id: string;
+  author: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface TaskAttachment {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  dataUrl: string;
+}
+
+export interface TaskMetadata {
+  tags: string[];
+  attachments: TaskAttachment[];
+  comments: TaskComment[];
+}

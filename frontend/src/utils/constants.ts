@@ -1,4 +1,5 @@
-export const API_URL = import.meta.env.VITE_API_URL ?? 'https://cs2031-2025-2-hackathon-2-backend-production.up.railway.app/v1';
+export const API_URL =
+  import.meta.env.VITE_API_URL ?? '/api';
 
 export const STATUS_LABELS = {
   TODO: 'Por hacer',

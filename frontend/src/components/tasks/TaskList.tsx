@@ -1,4 +1,4 @@
-import { Task } from '../../types';
+import { Task, TaskMetadata } from '../../types';
 import TaskCard from './TaskCard';
 
 interface Props {
@@ -7,11 +7,12 @@ interface Props {
   onDelete: (task: Task) => void;
   onView: (task: Task) => void;
   onStatusChange: (task: Task, status: Task['status']) => void;
+  getMetadata: (taskId: string) => TaskMetadata;
 }
 
-const TaskList = ({ tasks, onEdit, onDelete, onView, onStatusChange }: Props) => {
+const TaskList = ({ tasks, onEdit, onDelete, onView, onStatusChange, getMetadata }: Props) => {
   if (!tasks.length) {
-    return <p className="text-sm text-slate-500">No hay tareas para los filtros seleccionados.</p>;
+    return <p className="text-sm text-slate-500 dark:text-slate-300">No hay tareas para los filtros seleccionados.</p>;
   }
 
   return (
@@ -24,6 +25,7 @@ const TaskList = ({ tasks, onEdit, onDelete, onView, onStatusChange }: Props) =>
           onDelete={onDelete}
           onView={onView}
           onStatusChange={onStatusChange}
+          metadata={getMetadata(task.id)}
         />
       ))}
     </div>
